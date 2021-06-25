@@ -5,14 +5,14 @@ from src.app import socketio
 from src.services.group import find_group_by_alias
 
 from tests.util import logged_as
-from tests.fixtures.auth_fixtures import setup_db_auth, tear_down_auth
+from tests.fixtures.user_fixtures import setup_db_user, tear_down_user
 from tests.fixtures.group_fixtures import tear_down_group
 
 @pytest.fixture(scope='module', autouse=True)
 def setup_fixture():
-    setup_db_auth()
+    setup_db_user()
     yield
-    tear_down_auth()
+    tear_down_user()
     tear_down_group()
 
 @logged_as('roger', '123')

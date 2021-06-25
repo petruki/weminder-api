@@ -4,12 +4,12 @@ from bson.objectid import ObjectId
 
 from errors import NotFoundError, InternalErrorError
 
-def group_input(name: str, alias: str, user_id: str):
+def validate(name: str, alias: str, user_id: str):
     """ Validates group values """
     pass
 
 def create_group(name: str, alias: str, user_id: str):
-    group_input(name, alias, user_id)
+    validate(name, alias, user_id)
 
     group = {
         'name': name,

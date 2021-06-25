@@ -3,7 +3,7 @@ import bcrypt
 from .mongodb import db
 from errors import BadRequestError
 
-def user_input(username: str, password: str):
+def validate(username: str, password: str):
     """ Validates if username and password are valid """
     
     if not username:
@@ -13,7 +13,7 @@ def user_input(username: str, password: str):
         raise BadRequestError('Password cannot be less than 2 characters')
 
 def signup(username: str, password: str) -> dict:
-    user_input(username, password)
+    validate(username, password)
 
     salt = bcrypt.gensalt()
     hashed = bcrypt.hashpw(password.encode('utf8'), salt)
@@ -28,7 +28,7 @@ def signup(username: str, password: str) -> dict:
     return user
 
 def authenticate(username: str, password: str) -> bool:
-    user_input(username, password)
+    validate(username, password)
 
     user = db.users.find_one({ 'username': username })
     if user is not None and bcrypt.checkpw(
@@ -36,3 +36,10 @@ def authenticate(username: str, password: str) -> bool:
         user['password'].encode('utf8')
     ):
         return user
+
+def get_users(user_ids: [str]):
+    users = []
+    for data in db.users.find({ '_id': user_ids }):
+        users.append({ 'username': data['username'] })
+
+    return users

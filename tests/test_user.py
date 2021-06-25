@@ -3,13 +3,13 @@ import pytest
 from src.app import socketio
 
 from tests.util import rest_client, logged_as, load_res
-from tests.fixtures.auth_fixtures import setup_db_auth, tear_down_auth
+from tests.fixtures.user_fixtures import setup_db_user, tear_down_user
 
 @pytest.fixture(scope='module', autouse=True)
 def setup_fixture():
-    setup_db_auth()
+    setup_db_user()
     yield
-    tear_down_auth()
+    tear_down_user()
 
 @logged_as('roger', 'invalid_password', consume=False)
 def test_not_logged(socketio_test_client):
