@@ -42,6 +42,10 @@ def leave_group(group_id: str, user_id):
         raise InternalErrorError(
             f"Not possible to leave Group {group_id} as User {user_id}")
 
+    group = db.groups.find_one({ '_id': ObjectId(group_id) })
+    if len(group['users']) == 0:
+        db.groups.delete_one({ '_id': ObjectId(group_id) })
+
 def find_group_by_alias(alias: str):
     group = db.groups.find_one({ 'alias': alias })
 

@@ -32,7 +32,7 @@ def on_leave_group(args, user_id: str):
         emit('on_leave_group', { 
             'message': f" UserId {user_id} has left", 
             'status': 200 
-        })
+        }, to=args['group_id'])
     except WeminderAPIError as e:
         emit('error', e.json())
 

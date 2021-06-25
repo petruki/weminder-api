@@ -28,6 +28,9 @@ def test_on_create_task(socketio_test_client):
     group = find_group_by_alias('FIXTURE1')
     add_user_to_group(group['_id'], 'roger')
 
+    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.get_received()
+
     # test
     socketio_test_client.emit('create_task', {
         'group_id': str(group['_id']),

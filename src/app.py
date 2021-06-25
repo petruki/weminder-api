@@ -40,6 +40,14 @@ def user_loader(id):
 def connection_handler():
     return Controller.on_connect(current_user)
 
+@socketio.on('join_room')
+def join_group_room_handler(args):
+    Controller.on_join_group_room(args)
+
+@socketio.on('leave_room')
+def leave_group_room_handler(args):
+    Controller.on_leave_group_room(args)
+
 @socketio.on('check')
 def on_check_handler(args):
     Controller.on_check(args)

@@ -68,6 +68,9 @@ def test_on_leave_group(socketio_test_client):
     assert group is not None
     assert len(group['users']) == 2
 
+    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.get_received()
+
     # test
     socketio_test_client.emit('leave_group', {
         'group_id': str(group['_id'])

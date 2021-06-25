@@ -1,6 +1,6 @@
 from flask import request, abort
 from flask_login import login_user, logout_user
-from flask_socketio import emit
+from flask_socketio import emit, join_room, leave_room
 
 from model import User
 from errors import WeminderAPIError
@@ -12,6 +12,14 @@ def on_connect(current_user):
     if not current_user.is_anonymous:
         return emit('connected_as', { 'id': current_user.id })
     return False
+
+def on_join_group_room(args):
+    group_room = args['group_id']
+    join_room(group_room)
+
+def on_leave_group_room(args):
+    group_room = args['group_id']
+    leave_room(group_room)
 
 def on_login():
     username = request.form['username']

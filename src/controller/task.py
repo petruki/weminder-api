@@ -14,6 +14,6 @@ def on_create_task(args, user_id: str):
             content=args['content'],
             priority=args['priority']
         )
-        emit('on_create_task', parse_json(task))
+        emit('on_create_task', parse_json(task), to=args['group_id'])
     except WeminderAPIError as e:
         emit('error', e.json())
