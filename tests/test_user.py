@@ -21,7 +21,7 @@ def test_logged(socketio_test_client):
 
     res = socketio_test_client.get_received()
     assert len(res) == 1
-    assert res[0]['name'] == 'connected_as'
+    assert res[0]['name'] == 'connected'
     assert len(res[0]['args']) == 1
     assert len(res[0]['args'][0]['id']) > 0
 
@@ -61,7 +61,7 @@ def test_logged_new_user(socketio_test_client):
 
     res = socketio_test_client.get_received()
     assert len(res) == 1
-    assert res[0]['name'] == 'connected_as'
+    assert res[0]['name'] == 'connected'
     assert len(res[0]['args']) == 1
     assert len(res[0]['args'][0]['id']) > 0
 

@@ -45,6 +45,9 @@ def leave_group(group_id: str, user_id):
     group = db.groups.find_one({ '_id': ObjectId(group_id) })
     if len(group['users']) == 0:
         db.groups.delete_one({ '_id': ObjectId(group_id) })
+        return True
+
+    return False
 
 def find_group_by_alias(alias: str):
     group = db.groups.find_one({ 'alias': alias })

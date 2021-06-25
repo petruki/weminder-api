@@ -1,16 +1,36 @@
 from flask import request, abort
 from flask_login import login_user, logout_user
-from flask_socketio import emit, join_room, leave_room
+from flask_socketio import emit, join_room, leave_room, disconnect
 
 from model import User
 from errors import WeminderAPIError
 import services as Services
 
 parse_json = Services.parse_json
+connected_users = []
+
+def get_user_session(user_id: str) -> dict:
+    """ Return dictionary containing 'user_id' and 'sid' """
+    
+    for data in connected_users:
+        if data['user_id'] == user_id:
+            return data
 
 def on_connect(current_user):
     if not current_user.is_anonymous:
-        return emit('connected_as', { 'id': current_user.id })
+        # Remove user if connected
+        existing_user = get_user_session(current_user.id)
+        if existing_user:
+            disconnect(existing_user['sid'])
+            connected_users.remove(existing_user)
+
+        # Save session info
+        connected_users.append({
+            'user_id': current_user.id,
+            'sid': request.sid
+        })
+
+        return emit('connected', { 'id': current_user.id })
     return False
 
 def on_join_group_room(args):

@@ -21,7 +21,6 @@ socketio = SocketIO(app)
 @app.route('/login', methods=['POST'])
 def login_handler():
     return Controller.on_login()
-    # return on_login()
 
 @app.route('/signup', methods=['POST'])
 def signup_handler():
@@ -60,7 +59,7 @@ def create_group_handler(args):
 
 @socketio.on('find_group')
 def find_group_handler(args):
-    Controller.on_find_group(args)
+    Controller.on_find_group(args, current_user.id)
 
 @socketio.on('find_user_groups')
 def find_user_groups_handler(args):
