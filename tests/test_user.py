@@ -2,7 +2,7 @@ import pytest
 
 from src.app import socketio
 
-from tests.util import rest_client, logged_as, load_res
+from tests.util import rest_client, logged_as, load_res, get_args
 from tests.fixtures.user_fixtures import setup_db_user, tear_down_user
 
 @pytest.fixture(scope='module', autouse=True)
@@ -23,7 +23,7 @@ def test_logged(socketio_test_client):
     assert len(res) == 1
     assert res[0]['name'] == 'connected'
     assert len(res[0]['args']) == 1
-    assert len(res[0]['args'][0]['id']) > 0
+    assert len(get_args(res)['id']) > 0
 
 def test_signup(rest_client):
     res = rest_client.post('/signup', data={ 
@@ -63,7 +63,7 @@ def test_logged_new_user(socketio_test_client):
     assert len(res) == 1
     assert res[0]['name'] == 'connected'
     assert len(res[0]['args']) == 1
-    assert len(res[0]['args'][0]['id']) > 0
+    assert len(get_args(res)['id']) > 0
 
 def test_logout(rest_client):
     # given

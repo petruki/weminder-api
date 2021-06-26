@@ -11,7 +11,7 @@ connected_users = []
 
 def get_user_session(user_id: str) -> dict:
     """ Return dictionary containing 'user_id' and 'sid' """
-    
+
     for data in connected_users:
         if data['user_id'] == user_id:
             return data

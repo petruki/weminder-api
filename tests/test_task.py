@@ -1,10 +1,9 @@
 import pytest
-import bson
 
 from src.app import socketio
 from src.services.group import find_group_by_alias
 
-from tests.util import logged_as
+from tests.util import logged_as, get_args
 from tests.fixtures.user_fixtures import setup_db_user, tear_down_user
 from tests.fixtures.task_fixtures import tear_down_task
 from tests.fixtures.group_fixtures import (
@@ -42,5 +41,25 @@ def test_on_create_task(socketio_test_client):
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
     assert res[0]['name'] == 'on_create_task'
-    assert res[0]['args'][0]['title'] == 'Task 1'
-    assert res[0]['args'][0]['priority'] == 1
+    assert get_args(res)['title'] == 'Task 1'
+    assert get_args(res)['priority'] == 1
+    assert len(get_args(res)['log']) == 0
+
+@logged_as('roger', '123')
+def test_on_list_tasks(socketio_test_client):
+    # given
+    group = find_group_by_alias('FIXTURE1')
+    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.get_received()
+
+    # test
+    socketio_test_client.emit('list_tasks', {
+        'group_id': str(group['_id'])
+    })
+
+    res = socketio_test_client.get_received()
+    assert len(res[0]['args']) == 1
+    assert res[0]['name'] == 'on_list_tasks'
+    assert get_args(res)[0]['group_id'] == str(group['_id'])
+    assert get_args(res)[0]['title'] == 'Task 1'
+    assert get_args(res)[0]['created_by']['username'] == 'roger'

@@ -13,16 +13,18 @@ def on_create_group(args, user_id: str):
             alias=args['alias'],
             user_id=user_id
         )
-        emit('on_create_group', parse_json(group))
+        emit('on_create_group', parse_json(group), to=get_user_session(user_id)['sid'])
     except WeminderAPIError as e:
         emit('error', e.json())
 
 def on_join_group(args, user_id: str):
     try:
         Services.join_group(args['group_id'], user_id)
+        users = Services.get_users([user_id])
+
         emit('on_join_group', { 
-            'message': f" UserId {user_id} has joined", 
-            'status': 200 
+            'message': f" User {users[0]['username']} has joined",
+            'user': users[0]['username']
         })
     except WeminderAPIError as e:
         emit('error', e.json())
@@ -32,9 +34,10 @@ def on_leave_group(args, user_id: str):
         if Services.leave_group(args['group_id'], user_id):
             close_room(args['group_id'])
 
+        users = Services.get_users([user_id])
         emit('on_leave_group', { 
-            'message': f" UserId {user_id} has left", 
-            'status': 200 
+            'message': f" User {users[0]['username']} has left", 
+            'user': users[0]['username']
         }, to=args['group_id'])
     except WeminderAPIError as e:
         emit('error', e.json())

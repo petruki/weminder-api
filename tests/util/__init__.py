@@ -25,3 +25,6 @@ def logged_as(username: str = None, password: str = None, consume: bool = True):
 
 def load_res(res) -> dict:
     return json.loads(res.data.decode('utf8'))
+
+def get_args(res):
+    return res[0]['args'][0]

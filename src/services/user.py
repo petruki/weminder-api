@@ -1,4 +1,5 @@
 import bcrypt
+from bson.objectid import ObjectId
 
 from .mongodb import db
 from errors import BadRequestError
@@ -38,8 +39,12 @@ def authenticate(username: str, password: str) -> bool:
         return user
 
 def get_users(user_ids: [str]):
+    _in = []
+    for u in user_ids:
+        _in.append(ObjectId(u))
+
     users = []
-    for data in db.users.find({ '_id': user_ids }):
+    for data in db.users.find({ '_id': { "$in": _in } }):
         users.append({ 'username': data['username'] })
 
     return users

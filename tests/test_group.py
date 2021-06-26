@@ -4,7 +4,7 @@ import bson
 from src.app import socketio
 from src.services.group import find_group_by_alias
 
-from tests.util import logged_as
+from tests.util import logged_as, get_args
 from tests.fixtures.user_fixtures import setup_db_user, tear_down_user
 from tests.fixtures.group_fixtures import tear_down_group
 
@@ -25,9 +25,9 @@ def test_on_create_group(socketio_test_client):
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
     assert res[0]['name'] == 'on_create_group'
-    assert res[0]['args'][0]['name'] == 'Project 1'
-    assert res[0]['args'][0]['alias'] == 'pj1'
-    assert len(res[0]['args'][0]['users']) > 0
+    assert get_args(res)['name'] == 'Project 1'
+    assert get_args(res)['alias'] == 'pj1'
+    assert len(get_args(res)['users']) > 0
 
 @logged_as('anna', '123')
 def test_on_find_group(socketio_test_client):
@@ -38,9 +38,9 @@ def test_on_find_group(socketio_test_client):
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
     assert res[0]['name'] == 'on_find_group'
-    assert res[0]['args'][0]['name'] == 'Project 1'
-    assert res[0]['args'][0]['alias'] == 'pj1'
-    assert bson.objectid.ObjectId.is_valid(res[0]['args'][0]['_id']['$oid']) 
+    assert get_args(res)['name'] == 'Project 1'
+    assert get_args(res)['alias'] == 'pj1'
+    assert bson.objectid.ObjectId.is_valid(get_args(res)['_id']['$oid']) 
 
 @logged_as('anna', '123')
 def test_on_join_group(socketio_test_client):
@@ -56,7 +56,7 @@ def test_on_join_group(socketio_test_client):
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
     assert res[0]['name'] == 'on_join_group'
-    assert res[0]['args'][0]['status'] == 200
+    assert get_args(res)['user'] == 'anna'
 
     group = find_group_by_alias('pj1')
     assert len(group['users']) == 2
@@ -79,7 +79,7 @@ def test_on_leave_group(socketio_test_client):
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
     assert res[0]['name'] == 'on_leave_group'
-    assert res[0]['args'][0]['status'] == 200
+    assert get_args(res)['user'] == 'anna'
 
     group = find_group_by_alias('pj1')
     assert len(group['users']) == 1
@@ -91,4 +91,4 @@ def test_on_find_user_group(socketio_test_client):
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
     assert res[0]['name'] == 'on_find_user_groups'
-    assert len(res[0]['args'][0]) == 1
+    assert len(get_args(res)) == 1

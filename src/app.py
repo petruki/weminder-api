@@ -79,5 +79,9 @@ def leave_group_handler(args):
 def create_task_handler(args):
     Controller.on_create_task(args, current_user.id)
 
+@socketio.on('list_tasks')
+def list_task_handler(args):
+    Controller.on_list_tasks(args, current_user.id)
+
 if __name__ == '__main__':
     socketio.run(app)

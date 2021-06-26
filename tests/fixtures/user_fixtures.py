@@ -8,14 +8,20 @@ def tear_down_user():
 def setup_db_user():
     salt = bcrypt.gensalt()
     hashed = bcrypt.hashpw(b'123', salt)
-    db.users.insert_one({
+
+    user_roger = {
         'username': 'roger', 
         'password': hashed.decode('utf8'),
         'email': 'roger@noreply-weminder.ca'
-    })
+    }
 
-    db.users.insert_one({
+    user_anna = {
         'username': 'anna', 
         'password': hashed.decode('utf8'),
         'email': 'anna@noreply-weminder.ca'
-    })
+    }
+
+    db.users.insert_one(user_roger)
+    db.users.insert_one(user_anna)
+
+    return (user_roger, user_anna)
