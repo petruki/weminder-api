@@ -15,7 +15,7 @@ def on_create_group(args, user_id: str):
         )
         emit('on_create_group', parse_json(group), to=get_user_session(user_id)['sid'])
     except WeminderAPIError as e:
-        emit('error', e.json())
+        emit('on_error', e.json())
 
 def on_join_group(args, user_id: str):
     try:
@@ -27,7 +27,7 @@ def on_join_group(args, user_id: str):
             'user': users[0]['username']
         })
     except WeminderAPIError as e:
-        emit('error', e.json())
+        emit('on_error', e.json())
 
 def on_leave_group(args, user_id: str):
     try:
@@ -40,18 +40,18 @@ def on_leave_group(args, user_id: str):
             'user': users[0]['username']
         }, to=args['group_id'])
     except WeminderAPIError as e:
-        emit('error', e.json())
+        emit('on_error', e.json())
 
 def on_find_group(args, user_id: str):
     try:
         group = Services.find_group_by_alias(args['alias'])
         emit('on_find_group', parse_json(group), to=get_user_session(user_id)['sid'])
     except WeminderAPIError as e:
-        emit('error', e.json())
+        emit('on_error', e.json())
 
 def on_find_user_groups(user_id: str):
     try:
         groups = Services.find_user_groups(user_id)
         emit('on_find_user_groups', parse_json(groups), to=get_user_session(user_id)['sid'])
     except WeminderAPIError as e:
-        emit('error', e.json())
+        emit('on_error', e.json())

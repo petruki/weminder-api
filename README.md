@@ -32,16 +32,16 @@ Name                         Stmts   Miss  Cover
 src\app.py                      60      2    97%
 src\controller\__init__.py       4      0   100%
 src\controller\check.py          3      0   100%
-src\controller\group.py         38     11    71%
+src\controller\group.py         38      3    92%
 src\controller\task.py          17      4    76%
 src\controller\user.py          51      4    92%
-src\errors\__init__.py          20      6    70%
+src\errors\__init__.py          20      0   100%
 src\model\__init__.py            4      0   100%
 src\services\__init__.py         7      0   100%
-src\services\group.py           35      6    83%
+src\services\group.py           52      8    85%
 src\services\mongodb.py          5      0   100%
 src\services\task.py            14      0   100%
 src\services\user.py            30      0   100%
 ------------------------------------------------
-TOTAL                          288     33    89%
+TOTAL                          305     21    93%
 ```

@@ -1,12 +1,38 @@
+import bson
+
 from .mongodb import db
 
 from bson.objectid import ObjectId
 
-from errors import NotFoundError, InternalErrorError
+from errors import NotFoundError, BadRequestError, InternalErrorError
 
-def validate(name: str, alias: str, user_id: str):
+def validate(
+    name = None, 
+    alias = None, 
+    user_id = None,
+    group_id = None
+):
     """ Validates group values """
-    pass
+
+    if name is not None and len(name) == 0:
+        raise BadRequestError('Name cannot be empty')
+
+    if alias is not None and len(alias) == 0:
+        raise BadRequestError('Alias cannot be empty')
+
+    if user_id is not None:
+        if len(user_id) == 0:
+            raise BadRequestError('User ID cannot be empty')
+
+        if not bson.objectid.ObjectId.is_valid(user_id):
+            raise BadRequestError('Invalid User ID')
+
+    if group_id is not None:
+        if len(group_id) == 0:
+            raise BadRequestError('Group ID cannot be empty')
+
+        if not bson.objectid.ObjectId.is_valid(group_id):
+            raise BadRequestError('Invalid Group ID')
 
 def create_group(name: str, alias: str, user_id: str):
     validate(name, alias, user_id)
@@ -32,6 +58,8 @@ def join_group(group_id: str, user_id: str):
             f"Not possible to join Group {group_id} as User {user_id}")
 
 def leave_group(group_id: str, user_id):
+    validate(user_id=user_id, group_id=group_id)
+
     result = db.groups.update_one({ 
         '_id': ObjectId(group_id)}, {
             '$pull': { 'users': user_id } 
@@ -50,6 +78,8 @@ def leave_group(group_id: str, user_id):
     return False
 
 def find_group_by_alias(alias: str):
+    validate(alias=alias)
+
     group = db.groups.find_one({ 'alias': alias })
 
     if group is None:
@@ -58,6 +88,8 @@ def find_group_by_alias(alias: str):
     return group
 
 def find_user_groups(user_id: str):
+    validate(user_id=user_id)
+
     groups = []
     for data in db.groups.find({ 'users': [user_id] }):
         groups.append(data)

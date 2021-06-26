@@ -1,11 +1,11 @@
 class WeminderAPIError(Exception):
-    """Base class for errors"""
+    """ Base class for errors """
     
     message = ''
     status = 0
 
     def json(self):
-        return f"{{ \"error\": \"{self.message}\", \"status\": \"{self.status}\" }}"
+        return { 'error': self.message, 'status': self.status }
 
 class NotFoundError(WeminderAPIError):
     def __init__(self, request: str):
