@@ -142,3 +142,44 @@ def test_on_update_task_fail(socketio_test_client):
     assert res[0]['name'] == 'on_error'
     assert get_args(res)['error'] == 'Content cannot be empty'
     assert get_args(res)['status'] == 400
+
+@logged_as('roger', '123')
+def test_on_delete_task(socketio_test_client):
+    # given
+    group = find_group_by_alias('FIXTURE1')
+    tasks = list_tasks_by_group(str(group['_id']))
+
+    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.get_received()
+
+    # test
+    socketio_test_client.emit('delete_task', {
+        'group_id': str(group['_id']),
+        'task_id': str(tasks[0]['_id'])
+    })
+
+    res = socketio_test_client.get_received()
+    assert len(res[0]['args']) == 1
+    assert res[0]['name'] == 'on_delete_task'
+    assert get_args(res)['task_id'] == str(tasks[0]['_id'])
+    assert get_args(res)['message'] == 'Task deleted'
+
+@logged_as('roger', '123')
+def test_on_delete_task_fail(socketio_test_client):
+    # given
+    group = find_group_by_alias('FIXTURE1')
+    
+    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.get_received()
+
+    # test
+    socketio_test_client.emit('delete_task', {
+        'group_id': str(group['_id']),
+        'task_id': 'INVALID_ID'
+    })
+
+    res = socketio_test_client.get_received()
+    assert len(res[0]['args']) == 1
+    assert res[0]['name'] == 'on_error'
+    assert get_args(res)['error'] == 'Invalid Task ID'
+    assert get_args(res)['status'] == 400

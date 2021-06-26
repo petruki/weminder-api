@@ -87,5 +87,9 @@ def list_task_handler(args):
 def update_task_handler(args):
     Controller.on_update_task(args)
 
+@socketio.on('delete_task')
+def delete_task_handler(args):
+    Controller.on_delete_task(args)
+
 if __name__ == '__main__':
     socketio.run(app)

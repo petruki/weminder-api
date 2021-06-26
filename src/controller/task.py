@@ -39,3 +39,13 @@ def on_update_task(args):
             emit('on_update_task', parse_json(task), to=args['group_id'])
     except WeminderAPIError as e:
         emit('on_error', e.json())
+
+def on_delete_task(args):
+    try:
+        if Services.delete_task(args.get('task_id', None)):
+            emit('on_delete_task', { 
+                'message': 'Task deleted',
+                'task_id': args['task_id']
+            }, to=args['group_id'])
+    except WeminderAPIError as e:
+        emit('on_error', e.json())

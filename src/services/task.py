@@ -103,3 +103,11 @@ def update_task(
     result = db.tasks.update_one({ '_id': ObjectId(task_id) }, update)
     if result.modified_count == 1:
         return db.tasks.find_one({ '_id': ObjectId(task_id) })
+
+def delete_task(task_id: str):
+    validate(task_id=task_id)
+
+    result = db.tasks.delete_one({ '_id': ObjectId(task_id) })
+    if result.deleted_count == 1:
+        return True
+    return False
