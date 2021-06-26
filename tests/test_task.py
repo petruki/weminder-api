@@ -2,6 +2,7 @@ import pytest
 
 from src.app import socketio
 from src.services.group import find_group_by_alias
+from src.services.task import list_tasks_by_group
 
 from tests.util import logged_as, get_args
 from tests.fixtures.user_fixtures import setup_db_user, tear_down_user
@@ -46,6 +47,28 @@ def test_on_create_task(socketio_test_client):
     assert len(get_args(res)['log']) == 0
 
 @logged_as('roger', '123')
+def test_on_create_task_fail(socketio_test_client):
+    # given
+    group = find_group_by_alias('FIXTURE1')
+
+    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.get_received()
+
+    # test
+    socketio_test_client.emit('create_task', {
+        'group_id': str(group['_id']),
+        'title': 'Task 2',
+        'content': 'Priority is not valid',
+        'priority': 10
+    })
+
+    res = socketio_test_client.get_received()
+    assert len(res[0]['args']) == 1
+    assert res[0]['name'] == 'on_error'
+    assert get_args(res)['error'] == 'Priority must be between 0 and 5'
+    assert get_args(res)['status'] == 400
+
+@logged_as('roger', '123')
 def test_on_list_tasks(socketio_test_client):
     # given
     group = find_group_by_alias('FIXTURE1')
@@ -60,6 +83,62 @@ def test_on_list_tasks(socketio_test_client):
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
     assert res[0]['name'] == 'on_list_tasks'
-    assert get_args(res)[0]['group_id'] == str(group['_id'])
+    assert str(get_args(res)[0]['group_id']['$oid']) == str(group['_id'])
     assert get_args(res)[0]['title'] == 'Task 1'
     assert get_args(res)[0]['created_by']['username'] == 'roger'
+
+@logged_as('roger', '123')
+def test_on_list_tasks_fail(socketio_test_client):
+    socketio_test_client.emit('list_tasks', {
+        'group_id': ''
+    })
+
+    res = socketio_test_client.get_received()
+    assert len(res[0]['args']) == 1
+    assert res[0]['name'] == 'on_error'
+    assert get_args(res)['error'] == 'Group ID cannot be empty'
+    assert get_args(res)['status'] == 400
+
+@logged_as('roger', '123')
+def test_on_update_task(socketio_test_client):
+    # given
+    group = find_group_by_alias('FIXTURE1')
+    tasks = list_tasks_by_group(str(group['_id']))
+
+    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.get_received()
+
+    # test
+    socketio_test_client.emit('update_task', {
+        'group_id': str(group['_id']),
+        'task_id': str(tasks[0]['_id']),
+        'content': 'Updated content'
+    })
+
+    res = socketio_test_client.get_received()
+    assert len(res[0]['args']) == 1
+    assert res[0]['name'] == 'on_update_task'
+    assert get_args(res)['content'] == 'Updated content'
+    assert len(get_args(res)['log']) == 1
+
+@logged_as('roger', '123')
+def test_on_update_task_fail(socketio_test_client):
+    # given
+    group = find_group_by_alias('FIXTURE1')
+    tasks = list_tasks_by_group(str(group['_id']))
+
+    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.get_received()
+
+    # test
+    socketio_test_client.emit('update_task', {
+        'group_id': str(group['_id']),
+        'task_id': str(tasks[0]['_id']),
+        'content': ''
+    })
+
+    res = socketio_test_client.get_received()
+    assert len(res[0]['args']) == 1
+    assert res[0]['name'] == 'on_error'
+    assert get_args(res)['error'] == 'Content cannot be empty'
+    assert get_args(res)['status'] == 400

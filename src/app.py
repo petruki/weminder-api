@@ -83,5 +83,9 @@ def create_task_handler(args):
 def list_task_handler(args):
     Controller.on_list_tasks(args, current_user.id)
 
+@socketio.on('update_task')
+def update_task_handler(args):
+    Controller.on_update_task(args)
+
 if __name__ == '__main__':
     socketio.run(app)

@@ -1,7 +1,7 @@
 import pytest
 
 from src.services.group import find_group_by_alias
-from src.services.task import create_task, list_tasks_by_group
+from src.services.task import create_task, list_tasks_by_group, update_task
 
 from tests.fixtures.user_fixtures import setup_db_user, tear_down_user
 from tests.fixtures.task_fixtures import tear_down_task
@@ -27,15 +27,37 @@ def test_list_tasks(setup_fixture):
     add_user_to_group(group['_id'], roger['username'])
 
     create_task(
-        user_id=roger['_id'], 
-        group_id=group['_id'], 
+        user_id=str(roger['_id']), 
+        group_id=str(group['_id']), 
         title='New Task', 
         content='Task content', 
         priority=1
     )
 
     # test
-    tasks = list_tasks_by_group(group['_id'])
+    tasks = list_tasks_by_group(str(group['_id']))
     assert len(tasks) == 1
     assert tasks[0]['title'] == 'New Task'
     assert tasks[0]['created_by']['username'] == roger['username']
+
+def test_update_task(setup_fixture):
+    # given
+    group = find_group_by_alias('FIXTURE1')
+    tasks = list_tasks_by_group(str(group['_id']))
+
+    # test
+    task = update_task(
+        task_id=str(tasks[0]['_id']),
+        title='New Title'
+    )
+
+    assert task['priority'] == 1
+    assert task['title'] == 'New Title'
+
+    task = update_task(
+        task_id=str(tasks[0]['_id']),
+        priority=5
+    )
+
+    assert task['priority'] == 5
+    assert len(task['log']) == 2
