@@ -13,7 +13,7 @@ def on_create_task(args, user_id: str):
             group_id=args.get('group_id', None),
             title=args.get('title', None),
             content=args.get('content', None),
-            priority=args.get('priority', None)
+            status=args.get('status', None)
         )
         emit('on_create_task', parse_json(task), to=args['group_id'])
     except WeminderAPIError as e:
@@ -32,7 +32,7 @@ def on_update_task(args):
             task_id=args.get('task_id', None),
             title=args.get('title', None),
             content=args.get('content', None),
-            priority=args.get('priority', None)
+            status=args.get('status', None)
         )
 
         if task is not None:

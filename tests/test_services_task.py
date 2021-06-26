@@ -31,7 +31,7 @@ def test_list_tasks(setup_fixture):
         group_id=str(group['_id']), 
         title='New Task', 
         content='Task content', 
-        priority=1
+        status='TODO'
     )
 
     # test
@@ -51,13 +51,13 @@ def test_update_task(setup_fixture):
         title='New Title'
     )
 
-    assert task['priority'] == 1
+    assert task['status'] == 'TODO'
     assert task['title'] == 'New Title'
 
     task = update_task(
         task_id=str(tasks[0]['_id']),
-        priority=5
+        status='DOING'
     )
 
-    assert task['priority'] == 5
+    assert task['status'] == 'DOING'
     assert len(task['log']) == 2

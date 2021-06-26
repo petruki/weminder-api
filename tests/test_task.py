@@ -36,14 +36,14 @@ def test_on_create_task(socketio_test_client):
         'group_id': str(group['_id']),
         'title': 'Task 1',
         'content': 'Write some unit tests',
-        'priority': 1
+        'status': 'TODO'
     })
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
     assert res[0]['name'] == 'on_create_task'
     assert get_args(res)['title'] == 'Task 1'
-    assert get_args(res)['priority'] == 1
+    assert get_args(res)['status'] == 'TODO'
     assert len(get_args(res)['log']) == 0
 
 @logged_as('roger', '123')
@@ -58,14 +58,14 @@ def test_on_create_task_fail(socketio_test_client):
     socketio_test_client.emit('create_task', {
         'group_id': str(group['_id']),
         'title': 'Task 2',
-        'content': 'Priority is not valid',
-        'priority': 10
+        'content': 'Status is not valid',
+        'status': ''
     })
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
     assert res[0]['name'] == 'on_error'
-    assert get_args(res)['error'] == 'Priority must be between 0 and 5'
+    assert get_args(res)['error'] == 'Status cannot be empty'
     assert get_args(res)['status'] == 400
 
 @logged_as('roger', '123')
