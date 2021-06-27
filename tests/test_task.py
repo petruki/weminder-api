@@ -144,6 +144,50 @@ def test_on_update_task_fail(socketio_test_client):
     assert get_args(res)['status'] == 400
 
 @logged_as('roger', '123')
+def test_on_add_task_log(socketio_test_client):
+    # given
+    group = find_group_by_alias('FIXTURE1')
+    tasks = list_tasks_by_group(str(group['_id']))
+
+    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.get_received()
+
+    # test
+    socketio_test_client.emit('add_log', {
+        'group_id': str(group['_id']),
+        'task_id': str(tasks[0]['_id']),
+        'content': 'New log item'
+    })
+
+    res = socketio_test_client.get_received()
+    assert len(res[0]['args']) == 1
+    assert res[0]['name'] == 'on_update_task'
+    assert len(get_args(res)['log']) == 2
+    assert get_args(res)['log'][1]['message'] == 'New log item'
+
+@logged_as('roger', '123')
+def test_on_add_task_log_fail(socketio_test_client):
+    # given
+    group = find_group_by_alias('FIXTURE1')
+    tasks = list_tasks_by_group(str(group['_id']))
+
+    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.get_received()
+
+    # test
+    socketio_test_client.emit('add_log', {
+        'group_id': str(group['_id']),
+        'task_id': str(tasks[0]['_id']),
+        'content': ''
+    })
+
+    res = socketio_test_client.get_received()
+    assert len(res[0]['args']) == 1
+    assert res[0]['name'] == 'on_error'
+    assert get_args(res)['error'] == 'Content cannot be empty'
+    assert get_args(res)['status'] == 400
+
+@logged_as('roger', '123')
 def test_on_delete_task(socketio_test_client):
     # given
     group = find_group_by_alias('FIXTURE1')

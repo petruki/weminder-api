@@ -91,5 +91,9 @@ def update_task_handler(args):
 def delete_task_handler(args):
     Controller.on_delete_task(args)
 
+@socketio.on('add_log')
+def add_log_handler(args):
+    Controller.on_add_log(args)
+
 if __name__ == '__main__':
     socketio.run(app)

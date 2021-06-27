@@ -37,6 +37,13 @@ def validate(
         if not bson.objectid.ObjectId.is_valid(group_id):
             raise BadRequestError('Invalid Group ID')
 
+def get_log(message: str):
+    time = datetime.now().strftime('%m/%d/%Y %H:%M:%S')
+    return {
+        'message': message,
+        'created_at': time
+    }
+
 def create_task(user_id: str, group_id: str, title: str, content: str, status: str):
     validate(group_id, title, content, status)
 
@@ -82,20 +89,18 @@ def update_task(
     status = None
 ):
     validate(task_id=task_id, title=title, content=content)
-
-    time = datetime.now().strftime("%m/%d/%Y %H:%M:%S")
-
+    
     changes = []
     update = { '$set': {} }
     if title is not None:
         update['$set']['title'] = title
-        changes.append(f"{time}: Title has changed to {title}")
+        changes.append(get_log(f"Title has changed to {title}"))
     if content is not None:
         update['$set']['content'] = content
-        changes.append(f"{time}: Content updated")
+        changes.append(get_log('Content updated'))
     if status is not None:
         update['$set']['status'] = status
-        changes.append(f"{time}: Status has changed to {status}")
+        changes.append(get_log(f"Status has changed to {status}"))
 
     if len(changes) > 0:
         update['$push'] = { 'log': { '$each':  changes } }
@@ -111,3 +116,11 @@ def delete_task(task_id: str):
     if result.deleted_count == 1:
         return True
     return False
+
+def add_log(task_id: str, content: str):
+    validate(task_id=task_id, content=content)
+
+    update = { '$push': { 'log': get_log(content) } }
+    result = db.tasks.update_one({ '_id': ObjectId(task_id) }, update)
+    if result.modified_count == 1:
+        return db.tasks.find_one({ '_id': ObjectId(task_id) })

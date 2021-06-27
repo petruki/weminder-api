@@ -40,6 +40,18 @@ def on_update_task(args):
     except WeminderAPIError as e:
         emit('on_error', e.json())
 
+def on_add_log(args):
+    try:
+        task = Services.add_log(
+            task_id=args.get('task_id', None),
+            content=args.get('content', None)    
+        )
+
+        if task is not None:
+            emit('on_update_task', parse_json(task), to=args['group_id'])
+    except WeminderAPIError as e:
+        emit('on_error', e.json())
+
 def on_delete_task(args):
     try:
         if Services.delete_task(args.get('task_id', None)):
