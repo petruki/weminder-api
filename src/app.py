@@ -18,6 +18,10 @@ socketio = SocketIO(app)
 
 # Authentication/Connection Routes
 
+@app.route('/', methods=['GET'])
+def on_check_flask_handler():
+    return { 'status': 'success' }
+
 @app.route('/login', methods=['POST'])
 def login_handler():
     return Controller.on_login()
@@ -96,4 +100,4 @@ def add_log_handler(args):
     Controller.on_add_log(args)
 
 if __name__ == '__main__':
-    socketio.run(app)
+    socketio.run(app, host='0.0.0.0', port=5000)
