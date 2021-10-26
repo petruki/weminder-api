@@ -12,7 +12,9 @@ def logged_as(username: str = None, password: str = None, consume: bool = True):
     def with_logging(func):
         def wrapper(*args, **kwargs):
             flask_test_client = app.test_client()
-            flask_test_client.post('/login', data = { 'username': username, 'password': password })
+            flask_test_client.post('/login', 
+                data=json.dumps(dict(username=username, password=password)), content_type='application/json')
+                
             socketio_test_client = socketio.test_client(
                 app, flask_test_client = flask_test_client)
 

@@ -42,8 +42,8 @@ def on_leave_group_room(args):
     leave_room(group_room)
 
 def on_login():
-    username = request.form['username']
-    password = request.form['password']
+    username = request.get_json()['username']
+    password = request.get_json()['password']
 
     try:
         user = Services.authenticate(username, password)
@@ -51,13 +51,16 @@ def on_login():
             abort(401)
 
         login_user(User(user['_id']))
-        return ''
+        return {
+            'username': user['username'],
+            'email': user['email']
+        }
     except WeminderAPIError as e:
         return parse_json(e.json()), 400
 
 def on_signup():
-    username = request.form['username']
-    password = request.form['password']
+    username = request.get_json()['username']
+    password = request.get_json()['password']
 
     try:
         user = Services.signup(username, password)
