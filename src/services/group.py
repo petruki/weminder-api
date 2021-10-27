@@ -98,3 +98,13 @@ def find_user_groups(user_id: str):
         return []
 
     return groups
+
+def find_group_users(group_id: str):
+    validate(group_id=group_id)
+
+    group = db.groups.find_one({ '_id': ObjectId(group_id) })
+
+    if group is None:
+        raise NotFoundError(group_id)
+
+    return group['users']

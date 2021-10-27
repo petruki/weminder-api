@@ -55,3 +55,12 @@ def on_find_user_groups(user_id: str):
         emit('on_find_user_groups', parse_json(groups), to=get_user_session(user_id)['sid'])
     except WeminderAPIError as e:
         emit('on_error', e.json())
+
+
+def on_find_group_users(args, user_id: str):
+    try:
+        user_ids = Services.find_group_users(args['group_id'])
+        users = Services.get_users(user_ids)
+        emit('on_find_group_users', parse_json(users), to=get_user_session(user_id)['sid'])
+    except WeminderAPIError as e:
+        emit('on_error', e.json())

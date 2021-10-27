@@ -69,6 +69,10 @@ def find_group_handler(args):
 def find_user_groups_handler(args):
     Controller.on_find_user_groups(current_user.id)
 
+@socketio.on('find_group_users')
+def find_group_users_handler(args):
+    Controller.on_find_group_users(args, current_user.id)
+
 @socketio.on('join_group')
 def join_group_handler(args):
     Controller.on_join_group(args, current_user.id)
