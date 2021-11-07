@@ -19,6 +19,13 @@ def on_create_task(args, user_id: str):
     except WeminderAPIError as e:
         emit('on_error', e.json())
 
+def on_get_task(args, user_id: str):
+    try:
+        task = Services.get_task(args.get('task_id', None))
+        emit('on_get_task', parse_json(task), to=get_user_session(user_id)['sid'])
+    except WeminderAPIError as e:
+        emit('on_error', e.json())
+
 def on_list_tasks(args, user_id: str):
     try:
         tasks = Services.list_tasks_by_group(args['group_id'])

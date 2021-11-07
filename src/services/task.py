@@ -59,6 +59,14 @@ def create_task(user_id: str, group_id: str, title: str, content: str, status: s
     db.tasks.insert_one(task)
     return task
 
+def get_task(task_id: str):
+    validate(task_id=task_id)
+
+    task = db.tasks.find_one({ '_id': ObjectId(task_id) })
+    if task is None:
+        raise NotFoundError('Task')
+    return task
+
 def list_tasks_by_group(group_id: str):
     validate(group_id=group_id)
 

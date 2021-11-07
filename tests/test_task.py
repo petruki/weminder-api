@@ -1,4 +1,5 @@
 import pytest
+from bson.objectid import ObjectId
 
 from src.app import socketio
 from src.services.group import find_group_by_alias
@@ -45,6 +46,41 @@ def test_on_create_task(socketio_test_client):
     assert get_args(res)['title'] == 'Task 1'
     assert get_args(res)['status'] == 'TODO'
     assert len(get_args(res)['log']) == 0
+
+@logged_as('roger', '123')
+def test_on_get_task(socketio_test_client):
+    # given
+    group = find_group_by_alias('FIXTURE1')
+    tasks = list_tasks_by_group(str(group['_id']))
+
+    # test
+    socketio_test_client.emit('get_task', {
+        'group_id': str(group['_id']),
+        'task_id': str(tasks[0]['_id'])
+    })
+
+    res = socketio_test_client.get_received()
+    assert len(res[0]['args']) == 1
+    assert res[0]['name'] == 'on_get_task'
+    assert get_args(res)['title'] == 'Task 1'
+    assert get_args(res)['status'] == 'TODO'
+    assert len(get_args(res)['log']) == 0
+
+@logged_as('roger', '123')
+def test_on_get_task_not_found(socketio_test_client):
+    # given
+    group = find_group_by_alias('FIXTURE1')
+
+    # test
+    socketio_test_client.emit('get_task', {
+        'group_id': str(group['_id']),
+        'task_id': ObjectId().__str__()
+    })
+
+    res = socketio_test_client.get_received()
+    assert len(res[0]['args']) == 1
+    assert res[0]['name'] == 'on_error'
+    assert get_args(res)['error'] == 'Task not found'
 
 @logged_as('roger', '123')
 def test_on_create_task_fail(socketio_test_client):

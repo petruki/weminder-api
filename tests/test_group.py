@@ -158,3 +158,14 @@ def test_on_find_group_user(socketio_test_client):
     assert res[0]['name'] == 'on_find_group_users'
     assert len(get_args(res)) == 1
     assert get_args(res)[0]['username'] == 'roger'
+
+@logged_as('roger', '123')
+def test_on_find_group_user_fail(socketio_test_client):
+    socketio_test_client.emit('find_group_users', {
+        'group_id': ObjectId().__str__()
+    })
+
+    res = socketio_test_client.get_received()
+    assert len(res[0]['args']) == 1
+    assert res[0]['name'] == 'on_error'
+    assert get_args(res)['status'] == 404
