@@ -71,6 +71,16 @@ def on_signup():
     except WeminderAPIError as e:
         return parse_json(e.json()), 400
 
+def on_me(current_user):
+    if current_user.is_anonymous:
+        return abort(401)
+        
+    try:
+        user = Services.get_user_by_id(current_user.id)
+        return parse_json(user)
+    except WeminderAPIError as e:
+        return parse_json(e.json()), 400
+
 def on_logout():
     logout_user()
     return ''

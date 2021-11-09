@@ -12,7 +12,7 @@ def setup_fixture():
     yield
     tear_down_user()
 
-@logged_as('roger', 'invalid_password', consume=False)
+@logged_as('roger', 'invalid_password', consume = False)
 def test_not_logged(socketio_test_client):
     assert not socketio_test_client.is_connected()
 
@@ -71,6 +71,25 @@ def test_logged_new_user(socketio_test_client):
     assert res[0]['name'] == 'connected'
     assert len(res[0]['args']) == 1
     assert len(get_args(res)['id']) > 0
+
+def test_on_me(rest_client):
+    # given
+    rest_client.post('/login',
+        data=json.dumps(dict(
+            username='new_user', 
+            password='new_user_passsword'
+        )), content_type='application/json')
+
+    # test
+    res = rest_client.get('/me')
+    body = load_res(res)
+
+    assert res.status_code == 200
+    assert body['username'] == 'new_user'
+
+def test_on_me_fail_not_logged(rest_client):
+    res = rest_client.get('/me')
+    assert res.status_code == 401
 
 def test_logout(rest_client):
     # given

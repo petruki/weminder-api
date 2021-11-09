@@ -35,6 +35,11 @@ def signup_handler():
 def logout_handler():
     return Controller.on_logout()
 
+@app.route('/me', methods=['GET'])
+@login_required
+def me_handler():
+    return Controller.on_me(current_user)
+
 @login.user_loader
 def user_loader(id):
     return User(id)

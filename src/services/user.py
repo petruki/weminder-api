@@ -24,8 +24,10 @@ def signup(username: str, password: str) -> dict:
         'password': hashed.decode('utf8'),
         'email': f'{username}@noreply-weminder.ca'
     }
-    db.users.insert_one(user)
+    user_created = db.users.insert_one(user)
+    user['_id'] = str(user_created.inserted_id)
     del user['password']
+    
     return user
 
 def authenticate(username: str, password: str) -> bool:
@@ -48,3 +50,9 @@ def get_users(user_ids: [str]):
         users.append({ 'username': data['username'] })
 
     return users
+
+def get_user_by_id(user_id: str):
+    user = db.users.find_one({ '_id': ObjectId(user_id) })
+    if user is not None:
+        del user['password']
+        return user
