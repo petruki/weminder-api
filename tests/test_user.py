@@ -12,11 +12,11 @@ def setup_fixture():
     yield
     tear_down_user()
 
-@logged_as('roger', 'invalid_password', consume = False)
+@logged_as('roger', 'invalid_password', consume=False)
 def test_not_logged(socketio_test_client):
     assert not socketio_test_client.is_connected()
 
-@logged_as('roger', '123', consume = False)
+@logged_as('roger', '123', consume=False)
 def test_logged(socketio_test_client):
     assert socketio_test_client.is_connected()
 
@@ -72,33 +72,26 @@ def test_logged_new_user(socketio_test_client):
     assert len(res[0]['args']) == 1
     assert len(get_args(res)['id']) > 0
 
-def test_on_me(rest_client):
-    # given
-    rest_client.post('/login',
-        data=json.dumps(dict(
-            username='new_user', 
-            password='new_user_passsword'
-        )), content_type='application/json')
+@logged_as('roger', '123')
+def test_me(socketio_test_client):
+    socketio_test_client.emit('me')
+    res = socketio_test_client.get_received()
 
-    # test
-    res = rest_client.get('/me')
-    body = load_res(res)
+    assert len(res[0]['args']) == 1
+    assert res[0]['name'] == 'on_me'
+    assert get_args(res)['username'] == 'roger'
+    assert get_args(res)['email'] == 'roger@noreply-weminder.ca'
 
-    assert res.status_code == 200
-    assert body['username'] == 'new_user'
+@logged_as('roger', '123')
+def test_logout(socketio_test_client):
+    socketio_test_client.emit('logout')
+    res = socketio_test_client.get_received()
 
-def test_on_me_fail_not_logged(rest_client):
-    res = rest_client.get('/me')
-    assert res.status_code == 401
+    assert len(res[0]['args']) == 1
+    assert res[0]['name'] == 'on_logout'
+    assert get_args(res)['message'] == 'User logged out'
 
-def test_logout(rest_client):
-    # given
-    rest_client.post('/login',
-        data=json.dumps(dict(
-            username='new_user', 
-            password='new_user_passsword'
-        )), content_type='application/json')
+    socketio_test_client.emit('me')
+    res = socketio_test_client.get_received()
 
-    # test
-    res = rest_client.post('/logout')
-    assert res.status_code == 200
+    assert len(res) == 0

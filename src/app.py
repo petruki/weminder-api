@@ -16,7 +16,7 @@ app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
 login = LoginManager(app)
 socketio = SocketIO(app)
 
-# Authentication/Connection Routes
+# Flask Authentication/Connection Routes
 
 @app.route('/', methods=['GET'])
 def on_check_flask_handler():
@@ -30,15 +30,7 @@ def login_handler():
 def signup_handler():
     return Controller.on_signup()
 
-@app.route('/logout', methods=['POST'])
-@login_required
-def logout_handler():
-    return Controller.on_logout()
-
-@app.route('/me', methods=['GET'])
-@login_required
-def me_handler():
-    return Controller.on_me(current_user)
+# WebSocket Routes
 
 @login.user_loader
 def user_loader(id):
@@ -47,6 +39,14 @@ def user_loader(id):
 @socketio.on('connect')
 def connection_handler():
     return Controller.on_connect(current_user)
+
+@socketio.on('me')
+def me_handler():
+    Controller.on_me(current_user)
+
+@socketio.on('logout')
+def logout_handler():
+    Controller.on_logout(current_user.id)
 
 @socketio.on('join_room')
 def join_group_room_handler(args):

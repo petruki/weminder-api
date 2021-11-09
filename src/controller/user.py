@@ -52,6 +52,7 @@ def on_login():
 
         login_user(User(user['_id']))
         return {
+            '_id': user['_id'].__str__(),
             'username': user['username'],
             'email': user['email']
         }
@@ -72,15 +73,14 @@ def on_signup():
         return parse_json(e.json()), 400
 
 def on_me(current_user):
-    if current_user.is_anonymous:
-        return abort(401)
-        
-    try:
-        user = Services.get_user_by_id(current_user.id)
-        return parse_json(user)
-    except WeminderAPIError as e:
-        return parse_json(e.json()), 400
+    if not current_user.is_anonymous:
+        try:
+            user = Services.get_user_by_id(current_user.id)
+            if user is not None:
+                emit('on_me', parse_json(user), to=get_user_session(current_user.id)['sid'])
+        except WeminderAPIError as e:
+            emit('on_error', e.json())
 
-def on_logout():
+def on_logout(user_id: str):
+    emit('on_logout', { 'message': 'User logged out' }, to=get_user_session(user_id)['sid'])
     logout_user()
-    return ''
