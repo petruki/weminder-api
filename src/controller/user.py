@@ -1,8 +1,6 @@
 from flask import request, abort
-from flask_login import login_user, logout_user
 from flask_socketio import emit, join_room, leave_room, disconnect
 
-from model import User
 from errors import WeminderAPIError
 import services as Services
 
@@ -16,22 +14,22 @@ def get_user_session(user_id: str) -> dict:
         if data['user_id'] == user_id:
             return data
 
-def on_connect(current_user):
-    if not current_user.is_anonymous:
-        # Remove user if connected
-        existing_user = get_user_session(current_user.id)
-        if existing_user:
-            disconnect(existing_user['sid'])
-            connected_users.remove(existing_user)
+def on_connect(request):
+    user_id = request.args.get('auth')
 
-        # Save session info
-        connected_users.append({
-            'user_id': current_user.id,
-            'sid': request.sid
-        })
+    # Remove user if connected
+    existing_user = get_user_session(user_id)
+    if existing_user:
+        disconnect(existing_user['sid'])
+        connected_users.remove(existing_user)
 
-        return emit('connected', { 'id': current_user.id })
-    return False
+    # Save session info
+    connected_users.append({
+        'user_id': user_id,
+        'sid': request.sid
+    })
+
+    return emit('connected', { 'id': user_id })
 
 def on_join_group_room(args):
     group_room = args['group_id']
@@ -49,8 +47,7 @@ def on_login():
         user = Services.authenticate(username, password)
         if not user:
             abort(401)
-
-        login_user(User(user['_id']))
+        
         return {
             '_id': user['_id'].__str__(),
             'username': user['username'],
@@ -72,15 +69,16 @@ def on_signup():
     except WeminderAPIError as e:
         return parse_json(e.json()), 400
 
-def on_me(current_user):
-    if not current_user.is_anonymous:
-        try:
-            user = Services.get_user_by_id(current_user.id)
-            if user is not None:
-                emit('on_me', parse_json(user), to=get_user_session(current_user.id)['sid'])
-        except WeminderAPIError as e:
-            emit('on_error', e.json())
+def on_me(user_id):
+    try:
+        user = Services.get_user_by_id(user_id)
+        if user is not None:
+            emit('on_me', parse_json(user), to=get_user_session(user_id)['sid'])
+    except WeminderAPIError as e:
+        emit('on_error', e.json())
 
 def on_logout(user_id: str):
-    emit('on_logout', { 'message': 'User logged out' }, to=get_user_session(user_id)['sid'])
-    logout_user()
+    existing_user = get_user_session(user_id)
+    if existing_user:
+        disconnect(existing_user['sid'])
+        connected_users.remove(existing_user)

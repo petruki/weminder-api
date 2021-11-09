@@ -12,7 +12,7 @@ def setup_fixture():
     yield
     tear_down_user()
 
-@logged_as('roger', 'invalid_password', consume=False)
+@logged_as('roger', 'invalid_password')
 def test_not_logged(socketio_test_client):
     assert not socketio_test_client.is_connected()
 
@@ -82,16 +82,8 @@ def test_me(socketio_test_client):
     assert get_args(res)['username'] == 'roger'
     assert get_args(res)['email'] == 'roger@noreply-weminder.ca'
 
-@logged_as('roger', '123')
+@logged_as('roger', '123', consume=False)
 def test_logout(socketio_test_client):
+    assert socketio_test_client.is_connected()
     socketio_test_client.emit('logout')
-    res = socketio_test_client.get_received()
-
-    assert len(res[0]['args']) == 1
-    assert res[0]['name'] == 'on_logout'
-    assert get_args(res)['message'] == 'User logged out'
-
-    socketio_test_client.emit('me')
-    res = socketio_test_client.get_received()
-
-    assert len(res) == 0
+    assert not socketio_test_client.is_connected()
