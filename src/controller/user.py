@@ -70,12 +70,9 @@ def on_signup():
         return parse_json(e.json()), 400
 
 def on_me(user_id):
-    try:
-        user = Services.get_user_by_id(user_id)
-        if user is not None:
-            emit('on_me', parse_json(user), to=get_user_session(user_id)['sid'])
-    except WeminderAPIError as e:
-        emit('on_error', e.json())
+    user = Services.get_user_by_id(user_id)
+    if user is not None:
+        emit('on_me', parse_json(user), to=get_user_session(user_id)['sid'])
 
 def on_logout(user_id: str):
     existing_user = get_user_session(user_id)
