@@ -54,7 +54,7 @@ def test_on_find_group(socketio_test_client):
     assert res[0]['name'] == 'on_find_group'
     assert get_args(res)['name'] == 'Project 1'
     assert get_args(res)['alias'] == 'pj1'
-    assert bson.objectid.ObjectId.is_valid(get_args(res)['_id']['$oid'])
+    assert type(get_args(res)['_id']) == str
 
 @logged_as('anna', '123')
 def test_on_find_group_fail(socketio_test_client):

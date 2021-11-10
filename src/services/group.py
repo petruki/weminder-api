@@ -6,6 +6,11 @@ from bson.objectid import ObjectId
 
 from errors import NotFoundError, BadRequestError, InternalErrorError
 
+def convert_objectid_to_str(data: dict):
+    if '_id' in data:
+        data['_id'] = str(data['_id'])
+    return data
+
 def validate(
     name = None, 
     alias = None, 
@@ -44,7 +49,7 @@ def create_group(name: str, alias: str, user_id: str):
     }
 
     db.groups.insert_one(group)
-    return group
+    return convert_objectid_to_str(group)
 
 def join_group(group_id: str, user_id: str):
     result = db.groups.update_one({ 
@@ -85,14 +90,14 @@ def find_group_by_alias(alias: str):
     if group is None:
         raise NotFoundError(alias)
 
-    return group
+    return convert_objectid_to_str(group)
 
 def find_user_groups(user_id: str):
     validate(user_id=user_id)
 
     groups = []
     for data in db.groups.find({ 'users': [user_id] }):
-        groups.append(data)
+        groups.append(convert_objectid_to_str(data))
         
     if len(groups) == 0:
         return []

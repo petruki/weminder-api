@@ -5,6 +5,15 @@ from .mongodb import db
 from bson.objectid import ObjectId
 from errors import BadRequestError, NotFoundError
 
+def convert_objectid_to_str(data: dict):
+    if '_id' in data:
+        data['_id'] = str(data['_id'])
+    if 'user_id' in data:
+        data['user_id'] = str(data['user_id'])
+    if 'group_id' in data:
+        data['group_id'] = str(data['group_id'])
+    return data
+
 def validate(
     group_id = None, 
     title = None, 
@@ -57,7 +66,7 @@ def create_task(user_id: str, group_id: str, title: str, content: str, status: s
     }
 
     db.tasks.insert_one(task)
-    return task
+    return convert_objectid_to_str(task)
 
 def get_task(task_id: str):
     validate(task_id=task_id)
@@ -65,6 +74,8 @@ def get_task(task_id: str):
     task = db.tasks.find_one({ '_id': ObjectId(task_id) })
     if task is None:
         raise NotFoundError('Task')
+
+    task = convert_objectid_to_str(task)
     return task
 
 def list_tasks_by_group(group_id: str):
@@ -86,7 +97,7 @@ def list_tasks_by_group(group_id: str):
         },
         { '$unwind': '$created_by' }
     ]):
-        tasks.append(data)
+        tasks.append(convert_objectid_to_str(data))
 
     return tasks
 
@@ -115,7 +126,8 @@ def update_task(
     
     result = db.tasks.update_one({ '_id': ObjectId(task_id) }, update)
     if result.modified_count == 1:
-        return db.tasks.find_one({ '_id': ObjectId(task_id) })
+        task = db.tasks.find_one({ '_id': ObjectId(task_id) })
+        return convert_objectid_to_str(task)
 
 def delete_task(task_id: str):
     validate(task_id=task_id)
@@ -131,4 +143,5 @@ def add_log(task_id: str, content: str):
     update = { '$push': { 'log': get_log(content) } }
     result = db.tasks.update_one({ '_id': ObjectId(task_id) }, update)
     if result.modified_count == 1:
-        return db.tasks.find_one({ '_id': ObjectId(task_id) })
+        task = db.tasks.find_one({ '_id': ObjectId(task_id) })
+        return convert_objectid_to_str(task)

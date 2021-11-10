@@ -37,10 +37,10 @@ src\controller\task.py          43      0   100%
 src\controller\user.py          56      6    89%
 src\errors\__init__.py          20      0   100%
 src\services\__init__.py         7      0   100%
-src\services\group.py           58      8    86%
+src\services\group.py           62      8    87%
 src\services\mongodb.py          5      0   100%
-src\services\task.py            72      4    94%
-src\services\user.py            36      0   100%
+src\services\task.py            83      4    95%
+src\services\user.py            39      0   100%
 ------------------------------------------------
-TOTAL                          425     24    94%
+TOTAL                          443     24    95%
 ```

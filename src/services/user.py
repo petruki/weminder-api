@@ -4,6 +4,10 @@ from bson.objectid import ObjectId
 from .mongodb import db
 from errors import BadRequestError
 
+def convert_objectid_to_str(data: dict):
+    data['_id'] = str(data['_id'])
+    return data
+
 def validate(username: str, password: str):
     """ Validates if username and password are valid """
     
@@ -55,4 +59,4 @@ def get_user_by_id(user_id: str):
     user = db.users.find_one({ '_id': ObjectId(user_id) })
     if user is not None:
         del user['password']
-        return user
+        return convert_objectid_to_str(user)

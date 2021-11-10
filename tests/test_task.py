@@ -119,7 +119,7 @@ def test_on_list_tasks(socketio_test_client):
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
     assert res[0]['name'] == 'on_list_tasks'
-    assert str(get_args(res)[0]['group_id']['$oid']) == str(group['_id'])
+    assert str(get_args(res)[0]['group_id']) == str(group['_id'])
     assert get_args(res)[0]['title'] == 'Task 1'
     assert get_args(res)[0]['created_by']['username'] == 'roger'
 
