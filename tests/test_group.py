@@ -1,5 +1,6 @@
 import pytest
 import bson
+import json
 
 from bson.objectid import ObjectId
 
@@ -19,10 +20,10 @@ def setup_fixture():
 
 @logged_as('roger', '123')
 def test_on_create_group(socketio_test_client):
-    socketio_test_client.emit('create_group', {
+    socketio_test_client.emit('create_group', json.dumps({
         'name': 'Project 1',
         'alias': 'pj1'
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -33,10 +34,10 @@ def test_on_create_group(socketio_test_client):
 
 @logged_as('roger', '123')
 def test_on_create_group_fail(socketio_test_client):
-    socketio_test_client.emit('create_group', {
+    socketio_test_client.emit('create_group', json.dumps({
         'name': 'Project 1',
         'alias': ''
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert res[0]['name'] == 'on_error'
@@ -45,9 +46,9 @@ def test_on_create_group_fail(socketio_test_client):
 
 @logged_as('anna', '123')
 def test_on_find_group(socketio_test_client):
-    socketio_test_client.emit('find_group', {
+    socketio_test_client.emit('find_group', json.dumps({
         'alias': 'pj1'
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -58,9 +59,9 @@ def test_on_find_group(socketio_test_client):
 
 @logged_as('anna', '123')
 def test_on_find_group_fail(socketio_test_client):
-    socketio_test_client.emit('find_group', {
+    socketio_test_client.emit('find_group', json.dumps({
         'alias': 'NOT_FOUND'
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -75,9 +76,9 @@ def test_on_join_group(socketio_test_client):
     assert group is not None
 
     # test
-    socketio_test_client.emit('join_group', {
+    socketio_test_client.emit('join_group', json.dumps({
         'group_id': str(group['_id'])
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -89,9 +90,9 @@ def test_on_join_group(socketio_test_client):
 
 @logged_as('anna', '123')
 def test_on_join_group_fail(socketio_test_client):
-    socketio_test_client.emit('join_group', {
+    socketio_test_client.emit('join_group', json.dumps({
         'group_id': ObjectId().__str__()
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -105,13 +106,13 @@ def test_on_leave_group(socketio_test_client):
     assert group is not None
     assert len(group['users']) == 2
 
-    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.emit('join_room', json.dumps({ 'group_id': str(group['_id']) }))
     socketio_test_client.get_received()
 
     # test
-    socketio_test_client.emit('leave_group', {
+    socketio_test_client.emit('leave_group', json.dumps({
         'group_id': str(group['_id'])
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -123,9 +124,9 @@ def test_on_leave_group(socketio_test_client):
 
 @logged_as('anna', '123')
 def test_on_leave_group_fail(socketio_test_client):
-    socketio_test_client.emit('leave_group', {
+    socketio_test_client.emit('leave_group', json.dumps({
         'group_id': ObjectId().__str__()
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -134,7 +135,7 @@ def test_on_leave_group_fail(socketio_test_client):
 
 @logged_as('roger', '123')
 def test_on_find_user_group(socketio_test_client):
-    socketio_test_client.emit('find_user_groups', {})
+    socketio_test_client.emit('find_user_groups', json.dumps({}))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -149,9 +150,9 @@ def test_on_find_group_user(socketio_test_client):
     assert len(group['users']) == 1
 
     # test
-    socketio_test_client.emit('find_group_users', {
+    socketio_test_client.emit('find_group_users', json.dumps({
         'group_id': str(group['_id'])
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -161,9 +162,9 @@ def test_on_find_group_user(socketio_test_client):
 
 @logged_as('roger', '123')
 def test_on_find_group_user_fail(socketio_test_client):
-    socketio_test_client.emit('find_group_users', {
+    socketio_test_client.emit('find_group_users', json.dumps({
         'group_id': ObjectId().__str__()
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1

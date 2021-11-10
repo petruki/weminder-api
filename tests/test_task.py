@@ -1,4 +1,5 @@
 import pytest
+import json
 from bson.objectid import ObjectId
 
 from src.app import socketio
@@ -29,16 +30,16 @@ def test_on_create_task(socketio_test_client):
     group = find_group_by_alias('FIXTURE1')
     add_user_to_group(group['_id'], 'roger')
 
-    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.emit('join_room', json.dumps({ 'group_id': str(group['_id']) }))
     socketio_test_client.get_received()
 
     # test
-    socketio_test_client.emit('create_task', {
+    socketio_test_client.emit('create_task', json.dumps({
         'group_id': str(group['_id']),
         'title': 'Task 1',
         'content': 'Write some unit tests',
         'status': 'TODO'
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -54,10 +55,10 @@ def test_on_get_task(socketio_test_client):
     tasks = list_tasks_by_group(str(group['_id']))
 
     # test
-    socketio_test_client.emit('get_task', {
+    socketio_test_client.emit('get_task', json.dumps({
         'group_id': str(group['_id']),
         'task_id': str(tasks[0]['_id'])
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -72,10 +73,10 @@ def test_on_get_task_not_found(socketio_test_client):
     group = find_group_by_alias('FIXTURE1')
 
     # test
-    socketio_test_client.emit('get_task', {
+    socketio_test_client.emit('get_task', json.dumps({
         'group_id': str(group['_id']),
         'task_id': ObjectId().__str__()
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -87,16 +88,16 @@ def test_on_create_task_fail(socketio_test_client):
     # given
     group = find_group_by_alias('FIXTURE1')
 
-    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.emit('join_room', json.dumps({ 'group_id': str(group['_id']) }))
     socketio_test_client.get_received()
 
     # test
-    socketio_test_client.emit('create_task', {
+    socketio_test_client.emit('create_task', json.dumps({
         'group_id': str(group['_id']),
         'title': 'Task 2',
         'content': 'Status is not valid',
         'status': ''
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -108,13 +109,13 @@ def test_on_create_task_fail(socketio_test_client):
 def test_on_list_tasks(socketio_test_client):
     # given
     group = find_group_by_alias('FIXTURE1')
-    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.emit('join_room', json.dumps({ 'group_id': str(group['_id']) }))
     socketio_test_client.get_received()
 
     # test
-    socketio_test_client.emit('list_tasks', {
+    socketio_test_client.emit('list_tasks', json.dumps({
         'group_id': str(group['_id'])
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -125,9 +126,9 @@ def test_on_list_tasks(socketio_test_client):
 
 @logged_as('roger', '123')
 def test_on_list_tasks_fail(socketio_test_client):
-    socketio_test_client.emit('list_tasks', {
+    socketio_test_client.emit('list_tasks', json.dumps({
         'group_id': ''
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -141,15 +142,15 @@ def test_on_update_task(socketio_test_client):
     group = find_group_by_alias('FIXTURE1')
     tasks = list_tasks_by_group(str(group['_id']))
 
-    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.emit('join_room', json.dumps({ 'group_id': str(group['_id']) }))
     socketio_test_client.get_received()
 
     # test
-    socketio_test_client.emit('update_task', {
+    socketio_test_client.emit('update_task', json.dumps({
         'group_id': str(group['_id']),
         'task_id': str(tasks[0]['_id']),
         'content': 'Updated content'
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -163,15 +164,15 @@ def test_on_update_task_fail(socketio_test_client):
     group = find_group_by_alias('FIXTURE1')
     tasks = list_tasks_by_group(str(group['_id']))
 
-    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.emit('join_room', json.dumps({ 'group_id': str(group['_id']) }))
     socketio_test_client.get_received()
 
     # test
-    socketio_test_client.emit('update_task', {
+    socketio_test_client.emit('update_task', json.dumps({
         'group_id': str(group['_id']),
         'task_id': str(tasks[0]['_id']),
         'content': ''
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -185,15 +186,15 @@ def test_on_add_task_log(socketio_test_client):
     group = find_group_by_alias('FIXTURE1')
     tasks = list_tasks_by_group(str(group['_id']))
 
-    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.emit('join_room', json.dumps({ 'group_id': str(group['_id']) }))
     socketio_test_client.get_received()
 
     # test
-    socketio_test_client.emit('add_log', {
+    socketio_test_client.emit('add_log', json.dumps({
         'group_id': str(group['_id']),
         'task_id': str(tasks[0]['_id']),
         'content': 'New log item'
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -207,15 +208,15 @@ def test_on_add_task_log_fail(socketio_test_client):
     group = find_group_by_alias('FIXTURE1')
     tasks = list_tasks_by_group(str(group['_id']))
 
-    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.emit('join_room', json.dumps({ 'group_id': str(group['_id']) }))
     socketio_test_client.get_received()
 
     # test
-    socketio_test_client.emit('add_log', {
+    socketio_test_client.emit('add_log', json.dumps({
         'group_id': str(group['_id']),
         'task_id': str(tasks[0]['_id']),
         'content': ''
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -229,14 +230,14 @@ def test_on_delete_task(socketio_test_client):
     group = find_group_by_alias('FIXTURE1')
     tasks = list_tasks_by_group(str(group['_id']))
 
-    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.emit('join_room', json.dumps({ 'group_id': str(group['_id']) }))
     socketio_test_client.get_received()
 
     # test
-    socketio_test_client.emit('delete_task', {
+    socketio_test_client.emit('delete_task', json.dumps({
         'group_id': str(group['_id']),
         'task_id': str(tasks[0]['_id'])
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
@@ -249,14 +250,14 @@ def test_on_delete_task_fail(socketio_test_client):
     # given
     group = find_group_by_alias('FIXTURE1')
     
-    socketio_test_client.emit('join_room', { 'group_id': str(group['_id']) })
+    socketio_test_client.emit('join_room', json.dumps({ 'group_id': str(group['_id']) }))
     socketio_test_client.get_received()
 
     # test
-    socketio_test_client.emit('delete_task', {
+    socketio_test_client.emit('delete_task', json.dumps({
         'group_id': str(group['_id']),
         'task_id': 'INVALID_ID'
-    })
+    }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1

@@ -1,4 +1,5 @@
 import pytest
+import json
 
 from tests.util import logged_as
 from tests.fixtures.user_fixtures import setup_db_user, tear_down_user
@@ -11,9 +12,9 @@ def setup_fixture():
 
 @logged_as('roger', '123')
 def test_on_check(socketio_test_client):
-    socketio_test_client.emit('check', {
+    socketio_test_client.emit('check', json.dumps({
         'user': 'roger'
-    })
+    }))
     
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
