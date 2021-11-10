@@ -29,18 +29,18 @@ pytest --cov=src
 ----------- coverage: platform win32, python 3.9.1-final-0 -----------
 Name                         Stmts   Miss  Cover
 ------------------------------------------------
-src\app.py                      96      3    97%
+src\app.py                     100      3    97%
 src\controller\__init__.py       4      0   100%
 src\controller\check.py          3      0   100%
-src\controller\group.py         45      3    93%
+src\controller\group.py         51      3    94%
 src\controller\task.py          43      0   100%
 src\controller\user.py          53      4    92%
 src\errors\__init__.py          20      0   100%
 src\services\__init__.py         7      0   100%
-src\services\group.py           62      8    87%
+src\services\group.py           73      8    89%
 src\services\mongodb.py          5      0   100%
 src\services\task.py            83      4    95%
 src\services\user.py            39      0   100%
 ------------------------------------------------
-TOTAL                          460     22    95%
+TOTAL                          481     22    95%
 ```

@@ -17,6 +17,13 @@ def on_create_group(args, user_id: str):
     except WeminderAPIError as e:
         emit('on_error', e.json())
 
+def on_update_group(args):
+    try:
+        Services.update_group(args['_id'], args['name'], args['alias'])
+        emit('on_update_group', parse_json(args), to=args['_id'])
+    except WeminderAPIError as e:
+        emit('on_error', e.json())
+
 def on_join_group(args, user_id: str):
     try:
         Services.join_group(args['group_id'], user_id)

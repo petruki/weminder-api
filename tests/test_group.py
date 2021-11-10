@@ -44,6 +44,45 @@ def test_on_create_group_fail(socketio_test_client):
     assert get_args(res)['error'] == 'Alias cannot be empty'
     assert get_args(res)['status'] == 400
 
+@logged_as('roger', '123')
+def test_on_update_group(socketio_test_client):
+    # given
+    group = find_group_by_alias('pj1')
+    socketio_test_client.emit('join_room', json.dumps({ 'group_id': str(group['_id']) }))
+    socketio_test_client.get_received()
+
+    # test
+    socketio_test_client.emit('update_group', json.dumps({
+        '_id': group['_id'],
+        'name': 'Project v1',
+        'alias': 'pj1'
+    }))
+
+    res = socketio_test_client.get_received()
+    assert len(res[0]['args']) == 1
+    assert res[0]['name'] == 'on_update_group'
+    assert get_args(res)['name'] == 'Project v1'
+    assert get_args(res)['alias'] == 'pj1'
+
+@logged_as('roger', '123')
+def test_on_update_group_fail(socketio_test_client):
+    # given
+    group = find_group_by_alias('pj1')
+    socketio_test_client.emit('join_room', json.dumps({ 'group_id': str(group['_id']) }))
+    socketio_test_client.get_received()
+
+    # test
+    socketio_test_client.emit('update_group', json.dumps({
+        '_id': group['_id'],
+        'name': 'Project v1',
+        'alias': ''
+    }))
+
+    res = socketio_test_client.get_received()
+    assert res[0]['name'] == 'on_error'
+    assert get_args(res)['error'] == 'Alias cannot be empty'
+    assert get_args(res)['status'] == 400
+
 @logged_as('anna', '123')
 def test_on_find_group(socketio_test_client):
     socketio_test_client.emit('find_group', json.dumps({
@@ -53,7 +92,7 @@ def test_on_find_group(socketio_test_client):
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
     assert res[0]['name'] == 'on_find_group'
-    assert get_args(res)['name'] == 'Project 1'
+    assert get_args(res)['name'] == 'Project v1'
     assert get_args(res)['alias'] == 'pj1'
     assert type(get_args(res)['_id']) == str
 

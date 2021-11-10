@@ -71,6 +71,11 @@ def on_check_handler(args):
 def create_group_handler(args):
     Controller.on_create_group(args, request.args.get('auth'))
 
+@socketio.on('update_group')
+@json_args
+def update_group_handler(args):
+    Controller.on_update_group(args)
+
 @socketio.on('find_group')
 @json_args
 def find_group_handler(args):

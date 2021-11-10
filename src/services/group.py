@@ -51,6 +51,21 @@ def create_group(name: str, alias: str, user_id: str):
     db.groups.insert_one(group)
     return convert_objectid_to_str(group)
 
+def update_group(group_id: str, name: str, alias: str):
+    validate(group_id=group_id, name=name, alias=alias)
+
+    update = { '$set': {} }
+    if name is not None:
+        update['$set']['name'] = name
+    if alias is not None:
+        update['$set']['alias'] = alias
+
+    result = db.groups.update_one({ '_id': ObjectId(group_id) }, update)
+
+    if result.modified_count == 1:
+        group = db.groups.find_one({ '_id': ObjectId(group_id) })
+        return convert_objectid_to_str(group)
+
 def join_group(group_id: str, user_id: str):
     result = db.groups.update_one({ 
         '_id': ObjectId(group_id)}, {
