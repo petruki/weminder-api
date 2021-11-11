@@ -26,26 +26,21 @@ def on_update_group(args):
 
 def on_join_group(args, user_id: str):
     try:
-        Services.join_group(args['group_id'], user_id)
+        group = Services.join_group(args['group_id'], user_id)
         users = Services.get_users([user_id])
 
-        emit('on_join_group', { 
-            'message': f" User {users[0]['username']} has joined",
-            'user': users[0]['username']
-        })
+        emit('on_join_group', parse_json(group), to=args['group_id'])
     except WeminderAPIError as e:
         emit('on_error', e.json())
 
 def on_leave_group(args, user_id: str):
     try:
-        if Services.leave_group(args['group_id'], user_id):
+        last_user, group = Services.leave_group(args['group_id'], user_id)
+        if last_user:
             close_room(args['group_id'])
 
         users = Services.get_users([user_id])
-        emit('on_leave_group', { 
-            'message': f" User {users[0]['username']} has left", 
-            'user': users[0]['username']
-        }, to=args['group_id'])
+        emit('on_leave_group', parse_json(group), to=args['group_id'])
     except WeminderAPIError as e:
         emit('on_error', e.json())
 

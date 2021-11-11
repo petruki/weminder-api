@@ -76,6 +76,8 @@ def join_group(group_id: str, user_id: str):
     if result.modified_count != 1:
         raise InternalErrorError(
             f"Not possible to join Group {group_id} as User {user_id}")
+            
+    return convert_objectid_to_str(db.groups.find_one({ '_id': ObjectId(group_id) }))
 
 def leave_group(group_id: str, user_id):
     validate(user_id=user_id, group_id=group_id)
@@ -90,12 +92,12 @@ def leave_group(group_id: str, user_id):
         raise InternalErrorError(
             f"Not possible to leave Group {group_id} as User {user_id}")
 
-    group = db.groups.find_one({ '_id': ObjectId(group_id) })
+    group = convert_objectid_to_str(db.groups.find_one({ '_id': ObjectId(group_id) }))
     if len(group['users']) == 0:
         db.groups.delete_one({ '_id': ObjectId(group_id) })
-        return True
+        return True, group
 
-    return False
+    return False, group
 
 def find_group_by_alias(alias: str):
     validate(alias=alias)

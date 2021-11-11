@@ -113,6 +113,8 @@ def test_on_join_group(socketio_test_client):
     # given
     group = find_group_by_alias('pj1')
     assert group is not None
+    socketio_test_client.emit('join_room', json.dumps({ 'group_id': str(group['_id']) }))
+    socketio_test_client.get_received()
 
     # test
     socketio_test_client.emit('join_group', json.dumps({
@@ -122,7 +124,6 @@ def test_on_join_group(socketio_test_client):
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
     assert res[0]['name'] == 'on_join_group'
-    assert get_args(res)['user'] == 'anna'
 
     group = find_group_by_alias('pj1')
     assert len(group['users']) == 2
@@ -156,7 +157,6 @@ def test_on_leave_group(socketio_test_client):
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
     assert res[0]['name'] == 'on_leave_group'
-    assert get_args(res)['user'] == 'anna'
 
     group = find_group_by_alias('pj1')
     assert len(group['users']) == 1
