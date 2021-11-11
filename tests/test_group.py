@@ -215,6 +215,7 @@ def test_on_find_group_user(socketio_test_client):
     assert res[0]['name'] == 'on_find_group_users'
     assert len(get_args(res)) == 1
     assert get_args(res)[0]['username'] == 'roger'
+    assert len(get_args(res)[0]['_id']) == 24
 
 @logged_as('roger', '123')
 def test_on_find_group_user_fail(socketio_test_client):

@@ -51,7 +51,11 @@ def get_users(user_ids: [str]):
 
     users = []
     for data in db.users.find({ '_id': { "$in": _in } }):
-        users.append({ 'username': data['username'] })
+        users.append(convert_objectid_to_str({ 
+            '_id': data['_id'], 
+            'username': data['username'], 
+            'email': data['email'] 
+        }))
 
     return users
 
