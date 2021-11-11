@@ -120,7 +120,7 @@ def list_task_handler(args):
 @socketio.on('update_task')
 @json_args
 def update_task_handler(args):
-    Controller.on_update_task(args)
+    Controller.on_update_task(args, request.args.get('auth'))
 
 @socketio.on('delete_task')
 @json_args
@@ -130,7 +130,7 @@ def delete_task_handler(args):
 @socketio.on('add_log')
 @json_args
 def add_log_handler(args):
-    Controller.on_add_log(args)
+    Controller.on_add_log(args, request.args.get('auth'))
 
 if __name__ == '__main__':
     socketio.run(app, host='0.0.0.0', port=5000)
