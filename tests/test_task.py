@@ -73,15 +73,16 @@ def test_on_get_task_not_found(socketio_test_client):
     group = find_group_by_alias('FIXTURE1')
 
     # test
+    task_id = ObjectId().__str__()
     socketio_test_client.emit('get_task', json.dumps({
         'group_id': str(group['_id']),
-        'task_id': ObjectId().__str__()
+        'task_id': task_id
     }))
 
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
     assert res[0]['name'] == 'on_error'
-    assert get_args(res)['error'] == 'Task not found'
+    assert get_args(res)['error'] == f'{task_id.__str__()} not found'
 
 @logged_as('roger', '123')
 def test_on_create_task_fail(socketio_test_client):

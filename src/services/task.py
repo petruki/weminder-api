@@ -73,7 +73,7 @@ def get_task(task_id: str):
 
     task = db.tasks.find_one({ '_id': ObjectId(task_id) })
     if task is None:
-        raise NotFoundError('Task')
+        raise NotFoundError(task_id)
 
     task = convert_objectid_to_str(task)
     return task
