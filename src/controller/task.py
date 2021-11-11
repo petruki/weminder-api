@@ -35,8 +35,10 @@ def on_list_tasks(args, user_id: str):
 
 def on_update_task(args):
     try:
+        current_task = Services.get_task(args.get('_id', None))
         task = Services.update_task(
-            task_id=args.get('task_id', None),
+            current_task=current_task,
+            task_id=args.get('_id', None),
             title=args.get('title', None),
             content=args.get('content', None),
             status=args.get('status', None)
@@ -61,10 +63,10 @@ def on_add_log(args):
 
 def on_delete_task(args):
     try:
-        if Services.delete_task(args.get('task_id', None)):
+        if Services.delete_task(args.get('_id', None)):
             emit('on_delete_task', { 
                 'message': 'Task deleted',
-                'task_id': args['task_id']
+                'task_id': args['_id']
             }, to=args['group_id'])
     except WeminderAPIError as e:
         emit('on_error', e.json())

@@ -148,8 +148,8 @@ def test_on_update_task(socketio_test_client):
 
     # test
     socketio_test_client.emit('update_task', json.dumps({
+        '_id': str(tasks[0]['_id']),
         'group_id': str(group['_id']),
-        'task_id': str(tasks[0]['_id']),
         'content': 'Updated content'
     }))
 
@@ -170,8 +170,8 @@ def test_on_update_task_fail(socketio_test_client):
 
     # test
     socketio_test_client.emit('update_task', json.dumps({
+        '_id': str(tasks[0]['_id']),
         'group_id': str(group['_id']),
-        'task_id': str(tasks[0]['_id']),
         'content': ''
     }))
 
@@ -236,8 +236,8 @@ def test_on_delete_task(socketio_test_client):
 
     # test
     socketio_test_client.emit('delete_task', json.dumps({
+        '_id': str(tasks[0]['_id']),
         'group_id': str(group['_id']),
-        'task_id': str(tasks[0]['_id'])
     }))
 
     res = socketio_test_client.get_received()
@@ -256,8 +256,8 @@ def test_on_delete_task_fail(socketio_test_client):
 
     # test
     socketio_test_client.emit('delete_task', json.dumps({
+        '_id': 'INVALID_ID',
         'group_id': str(group['_id']),
-        'task_id': 'INVALID_ID'
     }))
 
     res = socketio_test_client.get_received()

@@ -47,6 +47,7 @@ def test_update_task(setup_fixture):
 
     # test
     task = update_task(
+        current_task=tasks[0],
         task_id=str(tasks[0]['_id']),
         title='New Title'
     )
@@ -55,6 +56,7 @@ def test_update_task(setup_fixture):
     assert task['title'] == 'New Title'
 
     task = update_task(
+        current_task=tasks[0],
         task_id=str(tasks[0]['_id']),
         status='DOING'
     )

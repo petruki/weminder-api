@@ -102,6 +102,7 @@ def list_tasks_by_group(group_id: str):
     return tasks
 
 def update_task(
+    current_task: dict,
     task_id: str, 
     title = None, 
     content = None, 
@@ -111,13 +112,13 @@ def update_task(
     
     changes = []
     update = { '$set': {} }
-    if title is not None:
+    if title is not None and current_task['title'] != title:
         update['$set']['title'] = title
         changes.append(get_log(f"Title has changed to {title}"))
-    if content is not None:
+    if content is not None and current_task['content'] != content:
         update['$set']['content'] = content
         changes.append(get_log('Content updated'))
-    if status is not None:
+    if status is not None and current_task['status'] != status:
         update['$set']['status'] = status
         changes.append(get_log(f"Status has changed to {status}"))
 
