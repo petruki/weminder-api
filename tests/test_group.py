@@ -97,6 +97,23 @@ def test_on_find_group(socketio_test_client):
     assert type(get_args(res)['_id']) == str
 
 @logged_as('anna', '123')
+def test_on_find_group_by_id(socketio_test_client):
+    # given
+    group = find_group_by_alias('pj1')
+
+    # test
+    socketio_test_client.emit('find_group', json.dumps({
+        'group_id': str(group['_id'])
+    }))
+
+    res = socketio_test_client.get_received()
+    assert len(res[0]['args']) == 1
+    assert res[0]['name'] == 'on_find_group'
+    assert get_args(res)['name'] == 'Project v1'
+    assert get_args(res)['alias'] == 'pj1'
+    assert type(get_args(res)['_id']) == str
+
+@logged_as('anna', '123')
 def test_on_find_group_fail(socketio_test_client):
     socketio_test_client.emit('find_group', json.dumps({
         'alias': 'NOT_FOUND'

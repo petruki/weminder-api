@@ -109,6 +109,16 @@ def find_group_by_alias(alias: str):
 
     return convert_objectid_to_str(group)
 
+def find_group_by_id(group_id: str):
+    validate(group_id=group_id)
+
+    group = db.groups.find_one({ '_id': ObjectId(group_id) })
+
+    if group is None:
+        raise NotFoundError(alias)
+
+    return convert_objectid_to_str(group)
+
 def find_user_groups(user_id: str):
     validate(user_id=user_id)
 

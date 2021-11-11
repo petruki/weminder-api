@@ -82,7 +82,6 @@ def find_group_handler(args):
     Controller.on_find_group(args, request.args.get('auth'))
 
 @socketio.on('find_user_groups')
-@json_args
 def find_user_groups_handler(args):
     Controller.on_find_user_groups(request.args.get('auth'))
 

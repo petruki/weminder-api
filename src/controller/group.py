@@ -46,7 +46,12 @@ def on_leave_group(args, user_id: str):
 
 def on_find_group(args, user_id: str):
     try:
-        group = Services.find_group_by_alias(args['alias'])
+        if (args.get('alias', None) is not None):
+            group = Services.find_group_by_alias(args['alias'])
+
+        if (args.get('group_id', None) is not None):
+            group = Services.find_group_by_id(args['group_id'])
+
         emit('on_find_group', parse_json(group), to=get_user_session(user_id)['sid'])
     except WeminderAPIError as e:
         emit('on_error', e.json())
