@@ -123,7 +123,7 @@ def find_user_groups(user_id: str):
     validate(user_id=user_id)
 
     groups = []
-    for data in db.groups.find({ 'users': [user_id] }):
+    for data in db.groups.find({ 'users': user_id }):
         groups.append(convert_objectid_to_str(data))
         
     if len(groups) == 0:
