@@ -1,4 +1,4 @@
-from flask_socketio import emit, close_room
+from flask_socketio import emit, close_room, send
 
 from errors import WeminderAPIError
 from .user import get_user_session
@@ -20,7 +20,7 @@ def on_create_group(args, user_id: str):
 def on_update_group(args):
     try:
         Services.update_group(args['_id'], args['name'], args['alias'])
-        emit('on_update_group', parse_json(args), to=args['_id'])
+        emit('on_update_group', parse_json(args), room=args['_id'])
     except WeminderAPIError as e:
         emit('on_error', e.json())
 
@@ -29,18 +29,17 @@ def on_join_group(args, user_id: str):
         group = Services.join_group(args['group_id'], user_id)
         users = Services.get_users([user_id])
 
-        emit('on_join_group', parse_json(group), to=args['group_id'])
+        emit('on_join_group', parse_json(group), room=args['group_id'])
     except WeminderAPIError as e:
         emit('on_error', e.json())
 
 def on_leave_group(args, user_id: str):
     try:
         last_user, group = Services.leave_group(args['group_id'], user_id)
+        emit('on_leave_group', parse_json(group), room=args['group_id'])
+
         if last_user:
             close_room(args['group_id'])
-
-        users = Services.get_users([user_id])
-        emit('on_leave_group', parse_json(group), to=args['group_id'])
     except WeminderAPIError as e:
         emit('on_error', e.json())
 

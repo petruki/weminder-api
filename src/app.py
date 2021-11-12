@@ -52,12 +52,12 @@ def logout_handler():
 @socketio.on('join_room')
 @json_args
 def join_group_room_handler(args):
-    Controller.on_join_group_room(args)
+    Controller.on_join_group_room(args, request.args.get('auth'))
 
 @socketio.on('leave_room')
 @json_args
 def leave_group_room_handler(args):
-    Controller.on_leave_group_room(args)
+    Controller.on_leave_group_room(args, request.args.get('auth'))
 
 @socketio.on('check')
 @json_args

@@ -243,8 +243,7 @@ def test_on_delete_task(socketio_test_client):
     res = socketio_test_client.get_received()
     assert len(res[0]['args']) == 1
     assert res[0]['name'] == 'on_delete_task'
-    assert get_args(res)['task_id'] == str(tasks[0]['_id'])
-    assert get_args(res)['message'] == 'Task deleted'
+    assert get_args(res)['_id'] == str(tasks[0]['_id'])
 
 @logged_as('roger', '123')
 def test_on_delete_task_fail(socketio_test_client):

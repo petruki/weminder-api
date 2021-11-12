@@ -32,8 +32,8 @@ Name                         Stmts   Miss  Cover
 src\app.py                      99      3    97%
 src\controller\__init__.py       4      0   100%
 src\controller\check.py          3      0   100%
-src\controller\group.py         55      3    95%
-src\controller\task.py          46      0   100%
+src\controller\group.py         54      3    94%
+src\controller\task.py          47      0   100%
 src\controller\user.py          53      4    92%
 src\errors\__init__.py          20      0   100%
 src\services\__init__.py         7      0   100%

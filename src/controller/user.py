@@ -31,13 +31,13 @@ def on_connect(request):
 
     return emit('connected', { 'id': user_id })
 
-def on_join_group_room(args):
+def on_join_group_room(args, user_id: str):
     group_room = args['group_id']
-    join_room(group_room)
+    join_room(group_room, sid=get_user_session(user_id)['sid'])
 
-def on_leave_group_room(args):
+def on_leave_group_room(args, user_id):
     group_room = args['group_id']
-    leave_room(group_room)
+    leave_room(group_room, sid=get_user_session(user_id)['sid'])
 
 def on_login():
     username = request.get_json()['username']

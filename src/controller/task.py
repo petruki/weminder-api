@@ -15,7 +15,7 @@ def on_create_task(args, user_id: str):
             content=args.get('content', None),
             status=args.get('status', None)
         )
-        emit('on_create_task', parse_json(task), to=args['group_id'])
+        emit('on_create_task', parse_json(task), room=args['group_id'])
     except WeminderAPIError as e:
         emit('on_error', e.json())
 
@@ -47,7 +47,7 @@ def on_update_task(args, user_id: str):
         )
 
         if task is not None:
-            emit('on_update_task', parse_json(task), to=args['group_id'])
+            emit('on_update_task', parse_json(task), room=args['group_id'])
     except WeminderAPIError as e:
         emit('on_error', e.json())
 
@@ -61,16 +61,14 @@ def on_add_log(args, user_id: str):
         )
 
         if task is not None:
-            emit('on_update_task', parse_json(task), to=args['group_id'])
+            emit('on_update_task', parse_json(task), room=args['group_id'])
     except WeminderAPIError as e:
         emit('on_error', e.json())
 
 def on_delete_task(args):
     try:
+        task = Services.get_task(args.get('_id', None))
         if Services.delete_task(args.get('_id', None)):
-            emit('on_delete_task', { 
-                'message': 'Task deleted',
-                'task_id': args['_id']
-            }, to=args['group_id'])
+            emit('on_delete_task', parse_json(task), room=args['group_id'])
     except WeminderAPIError as e:
         emit('on_error', e.json())
