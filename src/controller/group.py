@@ -30,6 +30,7 @@ def on_join_group(args, user_id: str):
         users = Services.get_users([user_id])
 
         emit('on_join_group', parse_json(group), room=args['group_id'])
+        emit('on_join_group', parse_json(group), to=get_user_session(user_id)['sid'])
     except WeminderAPIError as e:
         emit('on_error', e.json())
 

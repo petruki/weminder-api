@@ -8,7 +8,7 @@ def rest_client():
     with app.test_client() as flask_test_client:
         yield flask_test_client
 
-def logged_as(username: str = None, password: str = None, consume: bool = True):
+def logged_as(username: str = None, password: str = None, consume: bool = True, channel = ""):
     def with_logging(func):
         def wrapper(*args, **kwargs):
             flask_test_client = app.test_client()
@@ -17,7 +17,7 @@ def logged_as(username: str = None, password: str = None, consume: bool = True):
                 
             if res.status_code == 200:
                 user_id = load_res(res)['_id']
-                socketio_test_client = socketio.test_client(app, query_string=f'auth={user_id}')
+                socketio_test_client = socketio.test_client(app, query_string=f'auth={user_id}&channel={channel}')
                 if socketio_test_client.is_connected() and consume:
                     socketio_test_client.get_received()
 

@@ -1,5 +1,5 @@
 from flask import request, abort
-from flask_socketio import emit, join_room, leave_room, disconnect
+from flask_socketio import emit, join_room, disconnect
 
 from errors import WeminderAPIError
 import services as Services
@@ -16,12 +16,17 @@ def get_user_session(user_id: str) -> dict:
 
 def on_connect(request):
     user_id = request.args.get('auth')
+    channel = request.args.get('channel')
+    user = Services.get_user_by_id(user_id)
 
     # Remove user if connected
     existing_user = get_user_session(user_id)
     if existing_user:
         disconnect(existing_user['sid'])
         connected_users.remove(existing_user)
+
+    if (len(channel) > 0):
+        join_room(channel)
 
     # Save session info
     connected_users.append({
@@ -31,14 +36,9 @@ def on_connect(request):
 
     return emit('connected', { 'id': user_id })
 
-def on_join_group_room(args, user_id: str):
+def on_join_group_room(args):
     group_room = args['group_id']
-    join_room(group_room, sid=get_user_session(user_id)['sid'])
-
-def on_leave_group_room(args, user_id):
-    group_room = args['group_id']
-    leave_room(group_room, sid=get_user_session(user_id)['sid'])
-
+    join_room(group_room)
 def on_login():
     username = request.get_json()['username']
     password = request.get_json()['password']
@@ -74,7 +74,9 @@ def on_me(user_id):
     if user is not None:
         emit('on_me', parse_json(user), to=get_user_session(user_id)['sid'])
 
-def on_logout(user_id: str):
+def on_logout(request):
+    user_id = request.args.get('auth')
+
     existing_user = get_user_session(user_id)
     if existing_user:
         disconnect(existing_user['sid'])

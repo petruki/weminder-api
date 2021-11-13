@@ -47,18 +47,12 @@ def me_handler():
 
 @socketio.on('logout')
 def logout_handler():
-    Controller.on_logout(request.args.get('auth'))
+    Controller.on_logout(request)
 
 @socketio.on('join_room')
 @json_args
 def join_group_room_handler(args):
-    Controller.on_join_group_room(args, request.args.get('auth'))
-
-@socketio.on('leave_room')
-@json_args
-def leave_group_room_handler(args):
-    Controller.on_leave_group_room(args, request.args.get('auth'))
-
+    Controller.on_join_group_room(args)
 @socketio.on('check')
 @json_args
 def on_check_handler(args):
