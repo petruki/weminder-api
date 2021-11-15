@@ -125,7 +125,7 @@ def update_task(
         changes.append(get_log(f"Status has changed to {status}", username))
 
     if len(changes) > 0:
-        update['$push'] = { 'log': { '$each':  changes } }
+        update['$push'] = { 'log': { '$each': changes } }
     
     result = db.tasks.update_one({ '_id': ObjectId(task_id) }, update)
     if result.modified_count == 1:

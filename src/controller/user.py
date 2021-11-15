@@ -39,6 +39,7 @@ def on_connect(request):
 def on_join_group_room(args):
     group_room = args['group_id']
     join_room(group_room)
+    
 def on_login():
     username = request.get_json()['username']
     password = request.get_json()['password']

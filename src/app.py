@@ -53,6 +53,7 @@ def logout_handler():
 @json_args
 def join_group_room_handler(args):
     Controller.on_join_group_room(args)
+    
 @socketio.on('check')
 @json_args
 def on_check_handler(args):
