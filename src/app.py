@@ -11,8 +11,6 @@ from flask_socketio import SocketIO, emit
 import controller as Controller
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY')
-
 login = LoginManager(app)
 socketio = SocketIO(app)
 
