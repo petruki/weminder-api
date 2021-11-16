@@ -10,7 +10,6 @@
 Create a *.env* file containing the following:
 
 ```
-SECRET_KEY=secret
 MONGO_URI=mongodb://localhost:27017/weminder-api-db
 ```
 
